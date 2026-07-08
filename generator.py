@@ -20,13 +20,13 @@ def text(value, default=" "):
 
 def money(value):
     if pd.isna(value):
-        return "-"
+        return "$0.00"
 
     try:
         value = float(str(value).replace("$", "").replace(",", ""))
         return f"${value:,.2f}"
     except (ValueError, TypeError):
-        return "-"
+        return "$0.00"
 
 def generate_documents(df, template_name, output_name, env):
     output_dir = Path("generated pdfs")
@@ -65,11 +65,11 @@ def generate_documents(df, template_name, output_name, env):
                 rate=(
                     money(float(str(row["Admin Service Fees"]).replace("$", "").replace(",", "")) / 5)
                     if pd.notna(row["Admin Service Fees"])
-                    else "-"
+                    else "$0.00"
                 ),
 
-                one_time_fee_quantity=1 if pd.notna(row["One Time Fees"]) else "-",
-                admin_service_fee_quantity=5 if pd.notna(row["Admin Service Fees"]) else "-",
+                one_time_fee_quantity=1 if pd.notna(row["One Time Fees"]) else "0",
+                admin_service_fee_quantity=5 if pd.notna(row["Admin Service Fees"]) else "0",
 
                 miscellaneous_desc=text(row["Miscellaneous Description"], ""),
                 miscellaneous_fees=money(row["Miscellaneous Fees"]),
@@ -83,7 +83,7 @@ def generate_documents(df, template_name, output_name, env):
                         float(str(row["Total Fees"]).replace("$", "").replace(",", ""))
                     )
                     if pd.notna(row["Hard Commit Sum"]) and pd.notna(row["Total Fees"])
-                    else "-"
+                    else "$0.00"
                 ),
 
                 reference_number=text(row["Reference Num"]),
