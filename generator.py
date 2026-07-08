@@ -15,6 +15,19 @@ def resource_path(relative_path):
 
     return base_path / relative_path
 
+def text(value, default=" "):
+    return value if pd.notna(value) else default
+
+def money(value):
+    if pd.isna(value):
+        return "-"
+
+    try:
+        value = float(str(value).replace("$", "").replace(",", ""))
+        return f"${value:,.2f}"
+    except (ValueError, TypeError):
+        return "-"
+
 def generate_documents(df, template_name, output_name, env):
     output_dir = Path("generated pdfs")
     output_dir.mkdir(exist_ok=True)
@@ -27,32 +40,54 @@ def generate_documents(df, template_name, output_name, env):
         for _, row in df.iterrows():
 
             html_content = template.render(
-                shareholder_details=row["Shareholder Details"],
-                shareholder_name=row["Shareholder Name"],
-                shareholder_address=row["Shareholder Address"], 
-                shareholder_email=row["Shareholder Email"],
-                spv_name=row["SPV Name"],
-                spv_reg_num=row["SPV Reg Num"],
-                spv_director_name=row["SPV Director Name"],
-                company_name=row["Company Name"],
-                company_reg_num=row["Company Reg Num"],
-                currency=row["Currency"],
-                conversion_desc=row["Conversion Description"] if pd.notna(row["Conversion Description"]) else "",
-                date=row["Date"].strftime("%d/%m/%Y"),
-                due_date_format1 = row["Due Date"].strftime("%A %#d %B %Y"),
-                due_date_format2=row["Due Date"].strftime("%d/%m/%Y"),
-                one_time_fees=f"${round(row['One Time Fees'], 2):,.2f}",
-                admin_service_fees=f"${round(row['Admin Service Fees'], 2):,.2f}",
-                rate=f"${round(row['Admin Service Fees'] / 5, 2):,.2f}",
-                one_time_fee_quantity=1,
-                admin_service_fee_quantity=5,
-                miscellaneous_desc=row["Miscellaneous Description"],
-                miscellaneous_fees=f"${round(row['Miscellaneous Fees'], 2):,.2f}",
-                total_fees=f"${round(row['Total Fees'], 2):,.2f}",
-                hard_commit_sum=f"${round(row['Hard Commit Sum'], 2):,.2f}",
-                total_amount=f"${round(row['Hard Commit Sum'] + row['Total Fees'], 2):,.2f}",
-                reference_number=row["Reference Num"],
-                invoice_number=row["Invoice Num"]
+                shareholder_details=text(row["Shareholder Details"]),
+                shareholder_name=text(row["Shareholder Name"]),
+                shareholder_address=text(row["Shareholder Address"]),
+                shareholder_email=text(row["Shareholder Email"]),
+
+                spv_name=text(row["SPV Name"]),
+                spv_reg_num=text(row["SPV Reg Num"]),
+                spv_director_name=text(row["SPV Director Name"]),
+
+                company_name=text(row["Company Name"]),
+                company_reg_num=text(row["Company Reg Num"]),
+
+                currency=text(row["Currency"]),
+                conversion_desc=text(row["Conversion Description"], ""),
+
+                date=row["Date"].strftime("%d/%m/%Y") if pd.notna(row["Date"]) else "-",
+                due_date_format1=row["Due Date"].strftime("%A %d %B %Y") if pd.notna(row["Due Date"]) else "-",
+                due_date_format2=row["Due Date"].strftime("%d/%m/%Y") if pd.notna(row["Due Date"]) else "-",
+
+                one_time_fees=money(row["One Time Fees"]),
+                admin_service_fees=money(row["Admin Service Fees"]),
+
+                rate=(
+                    money(float(str(row["Admin Service Fees"]).replace("$", "").replace(",", "")) / 5)
+                    if pd.notna(row["Admin Service Fees"])
+                    else "-"
+                ),
+
+                one_time_fee_quantity=1 if pd.notna(row["One Time Fees"]) else "-",
+                admin_service_fee_quantity=5 if pd.notna(row["Admin Service Fees"]) else "-",
+
+                miscellaneous_desc=text(row["Miscellaneous Description"], ""),
+                miscellaneous_fees=money(row["Miscellaneous Fees"]),
+
+                total_fees=money(row["Total Fees"]),
+                hard_commit_sum=money(row["Hard Commit Sum"]),
+
+                total_amount=(
+                    money(
+                        float(str(row["Hard Commit Sum"]).replace("$", "").replace(",", "")) +
+                        float(str(row["Total Fees"]).replace("$", "").replace(",", ""))
+                    )
+                    if pd.notna(row["Hard Commit Sum"]) and pd.notna(row["Total Fees"])
+                    else "-"
+                ),
+
+                reference_number=text(row["Reference Num"]),
+                invoice_number=text(row["Invoice Num"])
             )
 
             temp_html = output_dir / f"{row['Shareholder Name']}-{output_name}.html"

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+
+    <title>Capital Call</title>
+
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .top-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .company-box {
+            text-align: right;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .description-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+
+        .description-table th,
+        .description-table td {
+            border: 1px solid black;
+            padding: 10px;
+            vertical-align: top;
+            margin-bottom:1px
+        }
+
+        .description-table th:first-child,
+        .description-table td:first-child {
+            text-align: left;
+        }
+
+        .description-table th:last-child,
+        .description-table td.amount {
+            text-align: center;
+        }
+
+        .description-table td {
+            padding: 10px;
+            vertical-align: top;
+        }
+
+        .total-row {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .total-amount {
+            text-align: right;
+            font-size: 12px;
+        }
+
+        .wire-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .wire-table td {
+            border: 1px solid black;
+            padding: 15px;
+            width: 50%;
+            vertical-align: top;
+        }
+
+        .signature {
+            margin-top: 30px;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="top-section">
+
+    <div>
+        {{ date }}
+
+        <br><br>
+
+        Attn:<br>
+        {{ shareholder_name }}<br>
+        {{ shareholder_address }}<br>
+        {{ shareholder_email }}
+    </div>
+
+    <div class="company-box">
+
+        <div class="title">Capital Call</div>
+
+        {{ spv_name }}<br>
+        ({{ spv_reg_num }})<br>
+        c/o AngelCentral Pte Ltd
+
+    </div>
+
+</div>
+
+<p>
+    Ref# {{ reference_number }}<br>
+    <strong>
+        CAPITAL CALL NOTICE for
+        {{ spv_name }} ({{ spv_reg_num }}), for purpose of investing in {{ company_name }} ({{ company_reg_num }}),
+        by end {{ due_date_format1 }}, Singapore Standard Time.
+    </strong>
+</p>
+
+<p>
+    Please be advised that we are calling your capital commitment as above.
+    Please consider this letter to be the written notice for your action.
+    The usage of the capital drawn is for investment into
+    {{ company_name }} ({{ company_reg_num }}).
+</p>
+
+<p>
+    The service fees (for bank receipt costs and for the first five years; separate invoice) is to be made at the
+    same time to the account per details below.
+</p>
+
+<table class="description-table">
+
+    <tr>
+        <th>Description</th>
+        <th width="25%">Amount ({{ currency }})</th>
+    </tr>
+
+    <tr>
+        <td>
+            Your capital commitment to {{ spv_name }} in {{ currency }} <br>
+            {% if conversion_desc %}
+            {{ conversion_desc }}
+            {% endif %} 
+        </td>
+        <td class="amount">{{ hard_commit_sum }}</td>
+    </tr>
+
+    <tr>
+        <td>Service fee in {{ currency }} (refer to invoice attached)</td>
+        <td class="amount">{{ total_fees }}</td>
+    </tr>
+
+    <tr>
+        <td class="total-row" style="text-align: left;">
+            Total
+        </td>
+
+        <td class="total-amount" style="text-align: center;">
+            {{ total_amount }}
+        </td>
+    </tr>
+
+</table>
+
+<p><strong><u>Wire Instructions:</u></strong></p>
+
+<p>
+    Please remit both capital call and service fees to the SPV's Aspire account below by the close of business on
+    <strong>{{ due_date_format1 }}, Singapore Standard Time</strong>
+    in accordance with the instructions provided.
+</p>
+
+<p>
+    Do ensure that the FULL capital call and invoice amount are credited. <br><br>
+    Please indicate investor name in wire remarks and send a screenshot of your successful transfer to syndicate@angelcentral.co to facilitate our tracking.
+</p>
+
+<table class="wire-table">
+
+    <tr>
+
+        <td>
+            Bank details attached.<br><br>
+            If you are wiring from a NON-SG based bank, please contact us for a set of different wiring instructions.
+        </td>
+
+    </tr>
+
+</table>
+
+<div class="signature">
+
+    If you have any questions regarding this matter, please do not hesitate
+    to email syndicate@angelcentral.co<br>
+    Yours faithfully,<br>
+    {{ spv_director_name }}<br>
+    for and on behalf of {{ spv_name }}
+
+</div>
+
+</body>
+</html>
