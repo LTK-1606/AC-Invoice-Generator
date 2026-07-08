@@ -77,13 +77,12 @@ def generate_documents(df, template_name, output_name, env):
                 total_fees=money(row["Total Fees"]),
                 hard_commit_sum=money(row["Hard Commit Sum"]),
 
-                total_amount=(
-                    money(
-                        float(str(row["Hard Commit Sum"]).replace("$", "").replace(",", "")) +
-                        float(str(row["Total Fees"]).replace("$", "").replace(",", ""))
-                    )
-                    if pd.notna(row["Hard Commit Sum"]) and pd.notna(row["Total Fees"])
-                    else "$0.00"
+                total_amount = money(
+                    (float(str(row["Hard Commit Sum"]).replace("$", "").replace(",", ""))
+                    if pd.notna(row["Hard Commit Sum"]) else 0)
+                    +
+                    (float(str(row["Total Fees"]).replace("$", "").replace(",", ""))
+                    if pd.notna(row["Total Fees"]) else 0)
                 ),
 
                 reference_number=text(row["Reference Num"]),
